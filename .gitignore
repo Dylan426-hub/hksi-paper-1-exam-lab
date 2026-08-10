@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.env.*
+*.key
+*.zip
+*.pdf
+*.doc
+*.docx
+node_modules/
+coverage/
+tmp/

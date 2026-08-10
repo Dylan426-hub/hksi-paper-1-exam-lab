@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a3479" />
+    <meta
+      name="description"
+      content="为 institutional equity sales 设计的 HKSI LE Paper 1 非官方备考工作台：版本校验、九章诊断、原创题库、限时模考、错题回炉与双语术语。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content="HKSI P1 · Institutional Sales Exam Desk" />
+    <meta
+      property="og:description"
+      content="60 题、90 分钟、70%：为 institutional equity sales 优化的 HKSI LE Paper 1 非官方训练工作台。"
+    />
+    <meta property="og:url" content="https://dylan426-hub.github.io/hksi-paper-1-exam-lab/" />
+    <meta property="og:image" content="https://dylan426-hub.github.io/hksi-paper-1-exam-lab/assets/og.png" />
+    <meta property="og:image:width" content="1730" />
+    <meta property="og:image:height" content="909" />
+    <meta property="og:image:alt" content="HKSI Paper 1 institutional sales exam desk" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HKSI P1 · Institutional Sales Exam Desk" />
+    <meta
+      name="twitter:description"
+      content="为 institutional equity sales 优化的 HKSI LE Paper 1 非官方训练工作台。"
+    />
+    <meta name="twitter:image" content="https://dylan426-hub.github.io/hksi-paper-1-exam-lab/assets/og.png" />
+    <link rel="canonical" href="https://dylan426-hub.github.io/hksi-paper-1-exam-lab/" />
+    <title>HKSI P1 · Institutional Sales Exam Desk</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="topbar">
+      <a class="brand" href="#desk" aria-label="返回考试作战台">
+        <span class="brand-mark" aria-hidden="true">P1</span>
+        <span class="brand-copy">
+          <strong>HKSI Exam Desk</strong>
+          <small>Institutional Sales Edition</small>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="页面导航">
+        <a class="nav-link active" href="#desk">作战台</a>
+        <a class="nav-link" href="#syllabus">九章地图</a>
+        <a class="nav-link" href="#practice">快问快练</a>
+        <a class="nav-link" href="#mock">限时模考</a>
+        <a class="nav-link" href="#terms">术语对照</a>
+      </nav>
+
+      <div class="top-actions">
+        <span class="official-badge">非官方学习工具</span>
+        <button class="source-open" id="openSources" type="button">资料与版本</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="section hero" id="desk">
+        <div class="hero-main">
+          <p class="eyebrow">HKSI LE PAPER 1 · FUNDAMENTALS OF SECURITIES AND FUTURES REGULATION</p>
+          <h1>把监管条文，练成<br /><span>90 分钟内的判断力</span></h1>
+          <p class="hero-lead">
+            为 institutional equity sales 定制：先用客户、订单、研究、内幕消息与利益冲突场景建立记忆钩子，再切回 HKSI 的定义、角色与考试口径。
+          </p>
+
+          <div class="version-alert" role="note" aria-label="资料版本提醒">
+            <span class="alert-label">版本闸门</span>
+            <div>
+              <strong>已在 HKSI.zip 内找到当前有效的官方繁体 v3.5 手册。</strong>
+              <p>它自 2026 年 6 月 30 日起生效；可见文件夹里的 v3.4.2 已过期。本站以 v3.5 的章节、比重与更新清单作底座，旧资料只用于辅助理解。</p>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <button class="button primary" type="button" data-jump="#practice" data-practice-mode="diagnostic">开始 9 题诊断</button>
+            <button class="button secondary" type="button" data-jump="#plan">生成我的冲刺计划</button>
+          </div>
+
+          <div class="exam-strip" aria-label="考试关键数据">
+            <article><strong>60</strong><span>道选择题</span></article>
+            <article><strong>90</strong><span>分钟</span></article>
+            <article><strong>70%</strong><span>及格线</span></article>
+            <article><strong>42</strong><span>题为理论过线</span></article>
+          </div>
+        </div>
+
+        <aside class="readiness-card" aria-label="备考进度">
+          <div class="readiness-head">
+            <div>
+              <p class="kicker">CURRENT READINESS</p>
+              <h2>你的备考盘面</h2>
+            </div>
+            <button class="text-button" id="resetProgress" type="button">重置</button>
+          </div>
+
+          <div class="score-ring" id="scoreRing" style="--score: 0">
+            <div><strong id="readinessScore">0</strong><span>/ 100</span></div>
+          </div>
+
+          <div class="readiness-metrics">
+            <div><span>已完成章节</span><strong id="completedTopics">0 / 9</strong></div>
+            <div><span>练习正确率</span><strong id="practiceAccuracy">尚未作答</strong></div>
+            <div><span>待回炉错题</span><strong id="wrongCount">0</strong></div>
+            <div><span>最近全真模考</span><strong id="mockReadiness">未完成</strong></div>
+          </div>
+
+          <div class="next-action" id="nextAction">
+            <span>NEXT</span>
+            <p>先完成 9 题诊断，建立你的薄弱章节排序。</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section plan-section" id="plan">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">PERSONAL SPRINT</p>
+            <h2>把约 95 小时，压成可执行的日程</h2>
+            <p>当前 v3.5 手册给出的 Paper 1 预计温习时间约为 95 小时。这里按考试日期、可用时间与官方章节比重拆成任务。</p>
+          </div>
+        </div>
+
+        <div class="plan-grid">
+          <form class="plan-form panel" id="planForm">
+            <label>
+              考试日期
+              <input id="examDate" type="date" required />
+            </label>
+            <label>
+              工作日可学
+              <select id="weekdayMinutes">
+                <option value="30">30 分钟</option>
+                <option value="45" selected>45 分钟</option>
+                <option value="60">60 分钟</option>
+                <option value="90">90 分钟</option>
+              </select>
+            </label>
+            <label>
+              周末可学
+              <select id="weekendMinutes">
+                <option value="60">60 分钟</option>
+                <option value="90" selected>90 分钟</option>
+                <option value="120">120 分钟</option>
+                <option value="180">180 分钟</option>
+              </select>
+            </label>
+            <button class="button primary" type="submit">更新计划</button>
+          </form>
+
+          <div class="plan-output panel" id="planOutput" aria-live="polite">
+            <div class="empty-state">
+              <span>01</span>
+              <p>填入考试日期后，系统会给出基础学习、混合训练、全真节奏和最后回炉四个阶段。</p>
+            </div>
+          </div>
+
+          <aside class="source-health panel">
+            <div class="panel-head">
+              <div>
+                <p class="kicker">SOURCE HEALTH</p>
+                <h3>资料健康度</h3>
+              </div>
+              <strong class="status-green">已找到现行版</strong>
+            </div>
+            <div class="health-row"><span>ZIP 内官方手册</span><strong class="status-green">v3.5 · 440页</strong></div>
+            <div class="health-row"><span>现行官方大纲</span><strong class="status-green">v3.5</strong></div>
+            <div class="health-row"><span>可见目录手册</span><strong class="status-red">v3.4.2</strong></div>
+            <div class="health-row"><span>九章课程讲义</span><strong class="status-amber">截图型</strong></div>
+            <div class="health-row"><span>官方样题</span><strong class="status-amber">2023 · 题型参考</strong></div>
+            <button class="text-link" id="openSourcesInline" type="button">查看完整扫描结果 →</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section update-section" id="updates">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">V3.5 DELTA WATCHLIST</p>
+            <h2>新版本先学变化，不让旧笔记带偏</h2>
+            <p>以下是 2026 年 4 月 v3.5 更新清单中最值得单独复核的区域；具体规则与数字仍以现行手册为准。</p>
+          </div>
+        </div>
+        <div class="update-grid" id="updateGrid"></div>
+      </section>
+
+      <section class="section syllabus-section" id="syllabus">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">NINE-TOPIC MAP</p>
+            <h2>九章不是九篇文章，是九种判断动作</h2>
+            <p>先抓“谁监管谁、谁可以做什么、对客户负什么责任、什么行为越界”，再处理易变数字和例外。</p>
+          </div>
+          <div class="filter-group" role="group" aria-label="章节筛选">
+            <button class="filter active" type="button" data-topic-filter="all">全部</button>
+            <button class="filter" type="button" data-topic-filter="sales">Sales 高频</button>
+            <button class="filter" type="button" data-topic-filter="weak">我的薄弱</button>
+          </div>
+        </div>
+
+        <div class="topic-layout">
+          <div class="topic-grid" id="topicGrid"></div>
+          <aside class="topic-detail panel" id="topicDetail" aria-live="polite"></aside>
+        </div>
+      </section>
+
+      <section class="section sales-lens" id="sales-lens">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">INSTITUTIONAL SALES LENS</p>
+            <h2>用你每天遇到的场景记住，但用考试定义作答</h2>
+          </div>
+        </div>
+        <div class="lens-grid" id="lensGrid"></div>
+        <div class="exam-rule-strip">
+          <strong>三条防错线</strong>
+          <span>机构客户 ≠ 自动获得所有专业投资者豁免</span>
+          <span>熟悉实务 ≠ 可以跳过题干定义</span>
+          <span>市场 colour ≠ 可以忽略内幕消息与保密边界</span>
+        </div>
+      </section>
+
+      <section class="section practice-section" id="practice">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">ACTIVE RECALL</p>
+            <h2>快问快练：答案、置信度、错因一起记</h2>
+            <p>高置信度做错，比低置信度做错更值得优先回炉。</p>
+          </div>
+          <div class="practice-summary" id="practiceSummary">本轮 0 题 · 正确 0</div>
+        </div>
+
+        <div class="practice-layout">
+          <aside class="practice-controls panel">
+            <div class="control-block">
+              <label for="practiceMode">训练模式</label>
+              <select id="practiceMode">
+                <option value="diagnostic">九章诊断</option>
+                <option value="meeting">客户会前 8 分钟（5题）</option>
+                <option value="topic">章节专项</option>
+                <option value="wrong">错题回炉</option>
+                <option value="mixed">随机混合</option>
+              </select>
+            </div>
+            <div class="control-block" id="practiceTopicWrap">
+              <label for="practiceTopic">选择章节</label>
+              <select id="practiceTopic"></select>
+            </div>
+            <div class="control-block">
+              <span>答题前置信度</span>
+              <div class="confidence-group" role="group" aria-label="答题置信度">
+                <button type="button" data-confidence="1">低</button>
+                <button type="button" data-confidence="2" class="active">中</button>
+                <button type="button" data-confidence="3">高</button>
+              </div>
+            </div>
+            <button class="button secondary full" id="newPracticeSet" type="button">重新抽题</button>
+            <button class="text-link" id="exportProgress" type="button">导出学习记录</button>
+          </aside>
+
+          <article class="question-panel panel" id="questionPanel" aria-live="polite">
+            <div class="question-loading">题库载入中…</div>
+          </article>
+
+          <aside class="attempt-ledger panel">
+            <div class="panel-head">
+              <div>
+                <p class="kicker">ERROR LEDGER</p>
+                <h3>本轮错因</h3>
+              </div>
+              <strong id="roundWrongCount">0</strong>
+            </div>
+            <div class="error-bars" id="errorBars"></div>
+            <p class="ledger-note">答错后标记概念、数字、角色、题干、组合、时间或过度推理；下一轮优先回炉。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section mock-section" id="mock">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">EXAM PACE</p>
+            <h2>把每题 90 秒，练成肌肉记忆</h2>
+            <p>全真模式严格按 60 题 / 90 分钟；题目按 v3.5 官方比重范围抽取，具体一套的分配仍是本站训练蓝图。</p>
+          </div>
+        </div>
+
+        <div class="mock-cards" id="mockCards">
+          <article class="mock-card panel">
+            <span class="mock-tag">QUICK CHECK</span>
+            <h3>20 题节奏测</h3>
+            <p>30 分钟。适合工作日午间，先练读题与跳题纪律。</p>
+            <div><strong>20</strong><span>题</span><strong>30:00</strong><span>限时</span></div>
+            <button class="button secondary" type="button" data-start-mock="20">开始</button>
+          </article>
+          <article class="mock-card primary-card panel">
+            <span class="mock-tag">FULL SIMULATION</span>
+            <h3>60 题全真节奏</h3>
+            <p>90 分钟。提交后才显示答案、章节命中率和错因。</p>
+            <div><strong>60</strong><span>题</span><strong>90:00</strong><span>限时</span></div>
+            <button class="button primary" type="button" data-start-mock="60">开始</button>
+          </article>
+          <article class="mock-card panel">
+            <span class="mock-tag">PASS BUFFER</span>
+            <h3>目标不是 42，而是 48+</h3>
+            <p>42/60 是理论过线；训练目标留出 6 题缓冲，降低临场反向题和组合题波动。</p>
+            <div><strong>48</strong><span>目标</span><strong>80%</strong><span>缓冲线</span></div>
+          </article>
+        </div>
+
+        <div class="mock-console panel" id="mockConsole" hidden></div>
+      </section>
+
+      <section class="section terms-section" id="terms">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">BILINGUAL RECOGNITION</p>
+            <h2>简体理解，繁体识别，英文定位</h2>
+            <p>考试题目语言为英文与繁体中文；你现有的简体手册更适合理解，临考前必须切换到繁体题干识别。</p>
+          </div>
+          <label class="term-search-wrap">
+            搜索术语
+            <input id="termSearch" type="search" placeholder="例如：负责人员 / responsible officer" />
+          </label>
+        </div>
+        <div class="term-table-wrap panel">
+          <table class="term-table">
+            <thead><tr><th>简体</th><th>繁体</th><th>English</th><th>考试辨析</th></tr></thead>
+            <tbody id="termRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section boundary-section" id="boundary">
+        <div>
+          <p class="kicker">BOUNDARY</p>
+          <h2>本工具帮助训练，不替代现行官方手册</h2>
+        </div>
+        <p>
+          本站不是 HKSI Institute 官方产品，也不提供法律或合规意见。练习题全部为原创设计，未上传你的 PDF、DOCX、ZIP 或历史原题。考试细节应以 HKSI 现行 v3.5 Study Guide、更新公告和考试政策为准。
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <span>HKSI P1 · Institutional Sales Exam Desk</span>
+      <span>数据仅保存在当前浏览器 · Updated 2026-08-10</span>
+    </footer>
+
+    <aside class="source-drawer" id="sourceDrawer" aria-label="资料与版本" aria-hidden="true">
+      <div class="drawer-panel">
+        <div class="drawer-head">
+          <div>
+            <p class="kicker">SOURCE CONTROL</p>
+            <h2>资料与版本</h2>
+            <p>先判断能不能用，再决定怎么学。</p>
+          </div>
+          <button class="icon-button" id="closeSources" type="button" aria-label="关闭资料面板">×</button>
+        </div>
+        <input class="source-search" id="sourceSearch" type="search" placeholder="搜索版本、文件或官方来源" />
+        <div class="source-list" id="sourceList"></div>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="data.js"></script>
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

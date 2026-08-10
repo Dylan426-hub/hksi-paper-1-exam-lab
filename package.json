@@ -1,0 +1,13 @@
+{
+  "name": "hksi-paper-1-exam-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Independent HKSI LE Paper 1 study desk for institutional equity sales.",
+  "scripts": {
+    "test": "node tests/validate.mjs",
+    "build": "node tests/validate.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
