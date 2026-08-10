@@ -535,6 +535,7 @@ h3 {
   font-weight: 720;
 }
 
+.block-section,
 .plan-section,
 .update-section,
 .syllabus-section,
@@ -727,6 +728,195 @@ select:focus {
   background: var(--blue-dark);
   color: #fff;
   outline: none;
+}
+
+.type1-route {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 13px 15px;
+  border: 1px solid #c5d7ec;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.type1-route strong {
+  margin-right: 4px;
+  color: var(--blue-dark);
+}
+
+.type1-route span {
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.type1-route i {
+  color: var(--red);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.block-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  align-items: start;
+}
+
+.block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.block-card {
+  display: flex;
+  min-height: 315px;
+  flex-direction: column;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-top: 4px solid #8ca3bd;
+  border-radius: var(--radius);
+  background: #fff;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.block-card.type1 {
+  border-top-color: var(--blue);
+}
+
+.block-card.exam {
+  border-top-color: var(--amber);
+}
+
+.block-card:hover,
+.block-card.active {
+  border-right-color: #7fa7dd;
+  border-bottom-color: #7fa7dd;
+  border-left-color: #7fa7dd;
+  box-shadow: 0 14px 30px rgba(8, 30, 58, 0.1);
+  transform: translateY(-2px);
+}
+
+.block-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.block-code,
+.block-lane {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.block-code {
+  color: var(--red);
+}
+
+.block-lane {
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--surface-soft);
+  color: var(--blue-dark);
+}
+
+.block-card.exam .block-lane {
+  background: #fff4dd;
+  color: #7a5411;
+}
+
+.block-card h3 {
+  margin: 12px 0 4px;
+  font-size: 18px;
+}
+
+.block-card > p {
+  margin: 8px 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.block-card .block-en {
+  margin: 0;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.block-topic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.block-topic-tags span {
+  padding: 3px 6px;
+  border: 1px solid #cad9ea;
+  border-radius: 4px;
+  color: var(--ink-2);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.block-progress {
+  display: grid;
+  gap: 7px;
+  margin-top: auto;
+  margin-bottom: 14px;
+}
+
+.block-progress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.block-progress strong {
+  color: var(--ink-2);
+}
+
+.block-detail {
+  position: sticky;
+  top: 86px;
+  min-height: 490px;
+  padding: 24px;
+}
+
+.block-detail .detail-number {
+  color: #dce6f1;
+  font-size: 64px;
+  font-weight: 950;
+  line-height: 0.9;
+}
+
+.block-detail h3 {
+  margin-top: 14px;
+  font-size: 23px;
+}
+
+.block-focus-list {
+  display: grid;
+  gap: 9px;
+  padding-left: 22px;
+  color: #344a64;
+  font-size: 13px;
+}
+
+.block-detail .button {
+  margin-top: 16px;
 }
 
 .topic-layout {
@@ -1098,6 +1288,11 @@ select:focus {
   color: var(--blue-dark);
   font-size: 10px;
   font-weight: 900;
+}
+
+.meta-chip.block-chip {
+  background: var(--blue-dark);
+  color: #fff;
 }
 
 .meta-chip.red {
@@ -1684,6 +1879,13 @@ footer {
     margin-right: 14px;
   }
 
+  .block-detail .health-row,
+  .topic-detail .health-row {
+    display: flex;
+    width: 100%;
+    margin-right: 0;
+  }
+
   .practice-layout {
     grid-template-columns: 220px minmax(0, 1fr);
   }
@@ -1720,12 +1922,14 @@ footer {
   }
 
   .plan-grid,
+  .block-layout,
   .topic-layout,
   .practice-layout,
   .mock-result-grid {
     grid-template-columns: 1fr;
   }
 
+  .block-detail,
   .topic-detail,
   .practice-controls {
     position: static;
@@ -1740,6 +1944,7 @@ footer {
     align-self: end;
   }
 
+  .block-grid,
   .topic-grid,
   .update-grid,
   .lens-grid,
@@ -1838,6 +2043,7 @@ footer {
   }
 
   .plan-phases,
+  .block-grid,
   .topic-grid,
   .update-grid,
   .lens-grid,
@@ -1853,6 +2059,10 @@ footer {
   .question-panel {
     min-height: 0;
     padding: 17px;
+  }
+
+  .block-detail {
+    min-height: 0;
   }
 
   .question-actions {

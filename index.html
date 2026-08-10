@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0a3479" />
     <meta
       name="description"
-      content="为 institutional equity sales 设计的 HKSI LE Paper 1 非官方备考工作台：版本校验、九章诊断、原创题库、限时模考、错题回炉与双语术语。"
+      content="为 Type 1 institutional equity sales 设计的 HKSI LE Paper 1 非官方备考工作台：按业务板块顺序练习、原创题库、限时模考与错题回炉。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_CN" />
@@ -45,10 +45,10 @@
 
       <nav class="nav" aria-label="页面导航">
         <a class="nav-link active" href="#desk">作战台</a>
-        <a class="nav-link" href="#syllabus">九章地图</a>
+        <a class="nav-link" href="#blocks">Type 1 板块</a>
         <a class="nav-link" href="#practice">快问快练</a>
         <a class="nav-link" href="#mock">限时模考</a>
-        <a class="nav-link" href="#terms">术语对照</a>
+        <a class="nav-link" href="#syllabus">考纲索引</a>
       </nav>
 
       <div class="top-actions">
@@ -63,7 +63,7 @@
           <p class="eyebrow">HKSI LE PAPER 1 · FUNDAMENTALS OF SECURITIES AND FUTURES REGULATION</p>
           <h1>把监管条文，练成<br /><span>90 分钟内的判断力</span></h1>
           <p class="hero-lead">
-            为 institutional equity sales 定制：先用客户、订单、研究、内幕消息与利益冲突场景建立记忆钩子，再切回 HKSI 的定义、角色与考试口径。
+            为 Type 1 institutional equity sales 定制：不再把知识散在九章里，先沿牌照、客户、订单、法团保障、AML、电子交易、交易所和市场失当的工作链练透，再回到考纲补齐。
           </p>
 
           <div class="version-alert" role="note" aria-label="资料版本提醒">
@@ -75,7 +75,7 @@
           </div>
 
           <div class="hero-actions">
-            <button class="button primary" type="button" data-jump="#practice" data-practice-mode="diagnostic">开始 9 题诊断</button>
+            <button class="button primary" type="button" data-jump="#practice" data-practice-mode="block" data-practice-block="B01">从 Type 1 牌照边界开练</button>
             <button class="button secondary" type="button" data-jump="#plan">生成我的冲刺计划</button>
           </div>
 
@@ -101,7 +101,7 @@
           </div>
 
           <div class="readiness-metrics">
-            <div><span>已完成章节</span><strong id="completedTopics">0 / 9</strong></div>
+            <div><span>已练板块</span><strong id="trainedBlocks">0 / 12</strong></div>
             <div><span>练习正确率</span><strong id="practiceAccuracy">尚未作答</strong></div>
             <div><span>待回炉错题</span><strong id="wrongCount">0</strong></div>
             <div><span>最近全真模考</span><strong id="mockReadiness">未完成</strong></div>
@@ -109,9 +109,41 @@
 
           <div class="next-action" id="nextAction">
             <span>NEXT</span>
-            <p>先完成 9 题诊断，建立你的薄弱章节排序。</p>
+            <p>先从 B01 Type 1 牌照边界开始，建立岗位最相关的规则骨架。</p>
           </div>
         </aside>
+      </section>
+
+      <section class="section block-section" id="blocks">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker">TYPE 1 TRAINING PATH</p>
+            <h2>先按工作判断链分板块，再回九章考纲定位</h2>
+            <p>每道题只归入一个板块，进度和正确率独立计算；B01–B09 是 Type 1 核心，B10–B12 用来补齐 Paper 1 考纲。</p>
+          </div>
+          <div class="filter-group" role="group" aria-label="训练板块筛选">
+            <button class="filter active" type="button" data-block-filter="all">全部 12 块</button>
+            <button class="filter" type="button" data-block-filter="type1">Type 1 核心</button>
+            <button class="filter" type="button" data-block-filter="exam">考纲补齐</button>
+          </div>
+        </div>
+
+        <div class="type1-route" aria-label="Type 1 推荐学习顺序">
+          <strong>岗位主线</strong>
+          <span>牌照边界</span><i>→</i>
+          <span>客户与适当性</span><i>→</i>
+          <span>订单与投诉</span><i>→</i>
+          <span>法团保障</span><i>→</i>
+          <span>AML / 数据</span><i>→</i>
+          <span>电子交易</span><i>→</i>
+          <span>HKEX</span><i>→</i>
+          <span>市场失当</span>
+        </div>
+
+        <div class="block-layout">
+          <div class="block-grid" id="blockGrid"></div>
+          <aside class="block-detail panel" id="blockDetail" aria-live="polite"></aside>
+        </div>
       </section>
 
       <section class="section plan-section" id="plan">
@@ -190,8 +222,8 @@
         <div class="section-title-row">
           <div>
             <p class="kicker">NINE-TOPIC MAP</p>
-            <h2>九章不是九篇文章，是九种判断动作</h2>
-            <p>先抓“谁监管谁、谁可以做什么、对客户负什么责任、什么行为越界”，再处理易变数字和例外。</p>
+            <h2>九章退到第二层：用来查考纲，不再承担训练顺序</h2>
+            <p>完成板块练习后，再用这里确认官方章节比重、薄弱 Topic 和 v3.5 定位。</p>
           </div>
           <div class="filter-group" role="group" aria-label="章节筛选">
             <button class="filter active" type="button" data-topic-filter="all">全部</button>
@@ -226,8 +258,8 @@
         <div class="section-title-row">
           <div>
             <p class="kicker">ACTIVE RECALL</p>
-            <h2>快问快练：答案、置信度、错因一起记</h2>
-            <p>高置信度做错，比低置信度做错更值得优先回炉。</p>
+            <h2>板块专项：顺序练完一个判断链</h2>
+            <p>板块模式按固定顺序出题，不再随机打散；答完后再进入错题或混合训练。</p>
           </div>
           <div class="practice-summary" id="practiceSummary">本轮 0 题 · 正确 0</div>
         </div>
@@ -237,6 +269,7 @@
             <div class="control-block">
               <label for="practiceMode">训练模式</label>
               <select id="practiceMode">
+                <option value="block" selected>Type 1 板块专项（推荐）</option>
                 <option value="diagnostic">九章诊断</option>
                 <option value="meeting">客户会前 8 分钟（5题）</option>
                 <option value="topic">章节专项</option>
@@ -244,7 +277,11 @@
                 <option value="mixed">随机混合</option>
               </select>
             </div>
-            <div class="control-block" id="practiceTopicWrap">
+            <div class="control-block" id="practiceBlockWrap">
+              <label for="practiceBlock">选择训练板块</label>
+              <select id="practiceBlock"></select>
+            </div>
+            <div class="control-block" id="practiceTopicWrap" hidden>
               <label for="practiceTopic">选择章节</label>
               <select id="practiceTopic"></select>
             </div>

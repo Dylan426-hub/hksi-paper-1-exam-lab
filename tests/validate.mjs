@@ -32,6 +32,9 @@ assert.match(html, /60/, "Official question count must be visible");
 assert.match(html, /90/, "Official duration must be visible");
 assert.match(html, /70%/, "Official pass mark must be visible");
 assert.match(html, /assets\/og\.png/, "Open Graph image must be wired into the page");
+assert.match(html, /id="blockGrid"/, "Type 1 block map must be present");
+assert.match(html, /id="practiceBlock"/, "Block practice selector must be present");
+assert.match(html, /Type 1 板块专项/, "Block practice must be the recommended mode");
 
 const sandbox = { window: {} };
 vm.createContext(sandbox);
@@ -45,6 +48,8 @@ const data = sandbox.window.HKSI_DATA;
 const questions = sandbox.window.HKSI_QUESTIONS;
 assert.ok(data && Array.isArray(data.topics), "HKSI_DATA.topics is required");
 assert.equal(data.topics.length, 9, "The syllabus must contain nine topics");
+assert.ok(Array.isArray(data.blocks), "HKSI_DATA.blocks is required");
+assert.equal(data.blocks.length, 12, "The training path must contain 12 exclusive blocks");
 assert.ok(Array.isArray(questions), "HKSI_QUESTIONS must be an array");
 assert.equal(questions.length, 60, "The full mock bank must contain exactly 60 questions");
 assert.ok(Array.isArray(data.updates) && data.updates.length === 5, "The v3.5 update watchlist must contain five areas");
@@ -83,6 +88,31 @@ assert.deepEqual(
   "Question ids must run continuously from P1-001 to P1-060",
 );
 
+const blockQuestionIds = [];
+const blockCodes = new Set();
+const questionsById = new Map(questions.map((question) => [question.id, question]));
+data.blocks.forEach((block, index) => {
+  assert.equal(block.id, `B${String(index + 1).padStart(2, "0")}`, `Block ${index + 1} has an unexpected id or order`);
+  assert.equal(block.order, index + 1, `${block.id} has an invalid sequence number`);
+  assert.ok(!blockCodes.has(block.id), `Duplicate block id: ${block.id}`);
+  blockCodes.add(block.id);
+  assert.ok(["type1", "exam"].includes(block.lane), `${block.id} has an invalid lane`);
+  assert.ok(Array.isArray(block.questionIds) && block.questionIds.length >= 3, `${block.id} needs at least three questions`);
+  assert.ok(Array.isArray(block.focus) && block.focus.length >= 3, `${block.id} needs a clear learning sequence`);
+  assert.ok(typeof block.outcome === "string" && block.outcome.trim(), `${block.id} needs a learning outcome`);
+  block.questionIds.forEach((questionId) => {
+    assert.ok(ids.has(questionId), `${block.id} references missing question ${questionId}`);
+    assert.ok(block.topics.includes(`T${questionsById.get(questionId).topic}`), `${block.id} omits the topic tag for ${questionId}`);
+    blockQuestionIds.push(questionId);
+  });
+});
+
+assert.equal(data.blocks.filter((block) => block.lane === "type1").length, 9, "Nine blocks should form the Type 1 core path");
+assert.equal(data.blocks.filter((block) => block.lane === "exam").length, 3, "Three blocks should complete the exam syllabus");
+assert.equal(blockQuestionIds.length, 60, "Block mapping must assign all 60 questions");
+assert.equal(new Set(blockQuestionIds).size, 60, "Each question must belong to exactly one block");
+assert.deepEqual(blockQuestionIds.slice().sort(), [...ids].sort(), "Block mapping must cover the complete question bank");
+
 const topicCounts = Object.fromEntries(data.topics.map((topic) => [topic.id, topic.mockCount]));
 assert.deepEqual(topicCounts, expectedDistribution, "Topic mock counts must match the question bank");
 assert.equal(data.topics.reduce((sum, topic) => sum + topic.mockCount, 0), 60, "Topic mock counts must sum to 60");
@@ -98,4 +128,4 @@ for (const file of walk(root)) {
   assert.ok(!forbiddenExtensions.has(path.extname(file).toLowerCase()), `Source document must not be published: ${path.relative(root, file)}`);
 }
 
-console.log("Validated HKSI P1 site: 9 topics, 60 original questions, safe publish tree.");
+console.log("Validated HKSI P1 site: 12 exclusive blocks, 9 topics, 60 original questions, safe publish tree.");

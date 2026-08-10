@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const data = window.HKSI_DATA || { topics: [], lens: [], updates: [], terms: [], sources: [] };
+  const data = window.HKSI_DATA || { topics: [], blocks: [], lens: [], updates: [], terms: [], sources: [] };
   const questions = Array.isArray(window.HKSI_QUESTIONS) ? window.HKSI_QUESTIONS : [];
   const STORAGE_KEY = "hksi-p1-exam-desk-v1";
   const ERROR_TYPES = ["概念混淆", "数字门槛", "角色边界", "反向题干", "组合题", "时间不足", "过度推理"];
@@ -23,7 +23,9 @@
 
   let state = loadState();
   let activeTopicId = 4;
+  let activeBlockId = "B01";
   let topicFilter = "all";
+  let blockFilter = "all";
   let confidence = 2;
   let practiceSet = [];
   let practiceIndex = 0;
@@ -113,22 +115,50 @@
       .map((item) => item.id);
   }
 
+  function latestAttemptsForIds(questionIds) {
+    const wanted = new Set(questionIds);
+    const latest = new Map();
+    state.attempts.forEach((attempt) => {
+      if (wanted.has(attempt.id)) latest.set(attempt.id, attempt);
+    });
+    return [...latest.values()];
+  }
+
+  function blockStats(block) {
+    const attempts = latestAttemptsForIds(block.questionIds);
+    const correct = attempts.filter((attempt) => attempt.correct).length;
+    return {
+      answered: attempts.length,
+      total: block.questionIds.length,
+      correct,
+      accuracy: attempts.length ? correct / attempts.length : null,
+      complete: attempts.length === block.questionIds.length,
+    };
+  }
+
+  function nextType1Block() {
+    return data.blocks
+      .filter((block) => block.lane === "type1")
+      .sort((a, b) => a.order - b.order)
+      .find((block) => !blockStats(block).complete);
+  }
+
   function updateReadiness() {
-    const completed = state.completedTopics.length;
     const attempts = state.attempts;
     const correct = attempts.filter((attempt) => attempt.correct).length;
     const accuracy = attempts.length ? correct / attempts.length : 0;
     const fullMocks = state.mockHistory.filter((mock) => mock.size === 60).slice(-3);
     const mockAverage = fullMocks.length ? fullMocks.reduce((sum, mock) => sum + mock.percent, 0) / fullMocks.length : 0;
-    const topicComponent = (completed / 9) * 25;
+    const trainedBlocks = data.blocks.filter((block) => blockStats(block).answered > 0).length;
+    const blockComponent = data.blocks.length ? (trainedBlocks / data.blocks.length) * 25 : 0;
     const accuracyComponent = attempts.length ? accuracy * 30 : 0;
     const volumeComponent = Math.min(attempts.length / 60, 1) * 20;
     const mockComponent = (mockAverage / 100) * 25;
-    const score = Math.round(topicComponent + accuracyComponent + volumeComponent + mockComponent);
+    const score = Math.round(blockComponent + accuracyComponent + volumeComponent + mockComponent);
 
     $("#readinessScore").textContent = String(score);
     $("#scoreRing").style.setProperty("--score", String(score));
-    $("#completedTopics").textContent = `${completed} / 9`;
+    $("#trainedBlocks").textContent = `${trainedBlocks} / ${data.blocks.length}`;
     $("#practiceAccuracy").textContent = attempts.length ? `${Math.round(accuracy * 100)}% · ${attempts.length}题` : "尚未作答";
     $("#wrongCount").textContent = String(state.wrongIds.length);
     $("#mockReadiness").textContent = fullMocks.length ? `${Math.round(mockAverage)}% · ${fullMocks.length}/3套` : "未完成";
@@ -145,18 +175,19 @@
     });
     const gateReady = fullMocks.length === 3 && fullMocks.every((mock) => mock.percent >= 80) && coreReady && noTopicBelow70;
 
-    const weak = data.topics.find((topic) => topic.id === weakestTopicIds()[0]);
+    const nextBlock = nextType1Block();
     const next = $("#nextAction p");
     if (!attempts.length) {
-      next.textContent = "先完成 9 题诊断，建立你的薄弱章节排序。";
+      next.textContent = "先从 B01 Type 1 牌照边界开始，建立岗位最相关的规则骨架。";
     } else if (state.wrongIds.length >= 5) {
       next.textContent = `先回炉 ${Math.min(state.wrongIds.length, 10)} 道错题，再继续扩题。`;
+    } else if (nextBlock) {
+      const progress = blockStats(nextBlock);
+      next.textContent = `继续 ${nextBlock.id} ${nextBlock.title}：已练 ${progress.answered}/${progress.total} 题。`;
     } else if (gateReady) {
       next.textContent = "已达到训练放行线：最近三套 ≥80%，T4–T6 ≥80%，无章节低于 70%。";
     } else if (fullMocks.length < 3) {
       next.textContent = `完成 ${3 - fullMocks.length} 套 60 题全真模考，建立稳定性样本。`;
-    } else if (weak) {
-      next.textContent = `下一步优先：${weak.code} ${weak.title}。`;
     } else {
       next.textContent = "开始一套 20 题节奏测，检查每题 90 秒纪律。";
     }
@@ -241,6 +272,71 @@
     });
   }
 
+  function startBlock(blockId) {
+    const block = data.blocks.find((item) => item.id === blockId);
+    if (!block) return;
+    activeBlockId = block.id;
+    $("#practiceMode").value = "block";
+    $("#practiceBlock").value = block.id;
+    buildPracticeSet();
+    renderBlocks();
+    renderBlockDetail();
+    $("#practice").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderBlocks() {
+    const visible = data.blocks.filter((block) => blockFilter === "all" || block.lane === blockFilter);
+    $("#blockGrid").innerHTML = visible
+      .map((block) => {
+        const stats = blockStats(block);
+        const coverage = Math.round((stats.answered / stats.total) * 100);
+        const accuracyLabel = stats.accuracy === null ? "未开始" : `正确率 ${Math.round(stats.accuracy * 100)}%`;
+        return `
+          <article class="block-card ${block.lane} ${block.id === activeBlockId ? "active" : ""}">
+            <div class="block-card-head">
+              <span class="block-code">${escapeHtml(block.id)}</span>
+              <span class="block-lane">${block.lane === "type1" ? "TYPE 1 核心" : "考纲补齐"}</span>
+            </div>
+            <h3>${escapeHtml(block.title)}</h3>
+            <p class="block-en">${escapeHtml(block.en)}</p>
+            <p>${escapeHtml(block.why)}</p>
+            <div class="block-topic-tags">${block.topics.map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
+            <div class="block-progress" aria-label="已练 ${stats.answered} / ${stats.total} 题">
+              <div><span>进度 ${stats.answered}/${stats.total}</span><strong>${accuracyLabel}</strong></div>
+              <div class="bar-track"><div class="bar-fill" style="width:${coverage}%"></div></div>
+            </div>
+            <button class="button ${block.lane === "type1" ? "primary" : "secondary"} full" type="button" data-start-block="${block.id}">
+              ${stats.answered ? "继续这个板块" : "开始这个板块"}
+            </button>
+          </article>`;
+      })
+      .join("");
+
+    $$('[data-start-block]').forEach((button) => {
+      button.addEventListener("click", () => startBlock(button.dataset.startBlock));
+    });
+  }
+
+  function renderBlockDetail() {
+    const block = data.blocks.find((item) => item.id === activeBlockId) || data.blocks[0];
+    if (!block) return;
+    const stats = blockStats(block);
+    $("#blockDetail").innerHTML = `
+      <div class="detail-number">${escapeHtml(block.id.slice(1))}</div>
+      <p class="kicker">${escapeHtml(block.en)}</p>
+      <h3>${escapeHtml(block.title)}</h3>
+      <p>${escapeHtml(block.why)}</p>
+      <ol class="block-focus-list">${block.focus.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
+      <div class="detail-callout"><strong>练完应做到：</strong>${escapeHtml(block.outcome)}</div>
+      <div class="health-row"><span>归属考纲</span><strong>${block.topics.map(escapeHtml).join(" · ")}</strong></div>
+      <div class="health-row"><span>固定题量</span><strong>${stats.total} 题</strong></div>
+      <div class="health-row"><span>已练进度</span><strong>${stats.answered} / ${stats.total}</strong></div>
+      <div class="health-row"><span>当前正确率</span><strong>${stats.accuracy === null ? "未开始" : `${Math.round(stats.accuracy * 100)}%`}</strong></div>
+      <button class="button primary full" type="button" data-detail-start-block="${block.id}">${stats.answered ? "继续顺序练习" : "开始顺序练习"}</button>`;
+
+    $("[data-detail-start-block]").addEventListener("click", () => startBlock(block.id));
+  }
+
   function renderLens() {
     $("#lensGrid").innerHTML = data.lens
       .map(
@@ -274,7 +370,7 @@
     if (days < 10) {
       const first = Math.max(1, Math.ceil(days * 0.55));
       return [
-        ["高权重急救", first, "T4–T6 + 每日错题"],
+        ["Type 1 急救", first, "B01–B08 顺序练 + 每日错题"],
         ["限时与回炉", Math.max(1, days - first), "20/60题模考 + 反向题干"],
       ];
     }
@@ -282,8 +378,8 @@
       const first = Math.max(3, Math.floor(days * 0.4));
       const second = Math.max(3, Math.floor(days * 0.35));
       return [
-        ["建立骨架", first, "九章地图 + T4–T6"],
-        ["混合训练", second, "场景题 + 数字/角色错因"],
+        ["岗位主线", first, "B01–B09 Type 1 核心"],
+        ["考纲补齐", second, "B10–B12 + 数字/角色错因"],
         ["全真回炉", Math.max(2, days - first - second), "60题模考 + v3.5 更新"],
       ];
     }
@@ -291,8 +387,8 @@
     const p2 = Math.floor(days * 0.3);
     const p3 = Math.floor(days * 0.2);
     return [
-      ["基础学习", p1, "T1–T9 骨架，T4–T6 加倍"],
-      ["章节专项", p2, "认知 Level 1→2→3"],
+      ["岗位主线", p1, "B01–B09，先练工作判断链"],
+      ["考纲补齐", p2, "B10–B12 + 九章索引"],
       ["混合模考", p3, "20题节奏 + 60题全真"],
       ["最后回炉", Math.max(1, days - p1 - p2 - p3), "错题、繁体术语、v3.5 更新"],
     ];
@@ -360,8 +456,17 @@
     $("#practiceTopic").value = String(activeTopicId);
   }
 
+  function populatePracticeBlocks() {
+    $("#practiceBlock").innerHTML = [...data.blocks]
+      .sort((a, b) => a.order - b.order)
+      .map((block) => `<option value="${block.id}">${block.id} · ${escapeHtml(block.title)}</option>`)
+      .join("");
+    $("#practiceBlock").value = activeBlockId;
+  }
+
   function buildPracticeSet() {
     const mode = $("#practiceMode").value;
+    $("#practiceBlockWrap").hidden = mode !== "block";
     $("#practiceTopicWrap").hidden = mode !== "topic";
     let pool = [];
     if (!questions.length) {
@@ -369,7 +474,16 @@
       renderPracticeQuestion();
       return;
     }
-    if (mode === "diagnostic") {
+    if (mode === "block") {
+      const block = data.blocks.find((item) => item.id === $("#practiceBlock").value) || data.blocks[0];
+      if (block) {
+        activeBlockId = block.id;
+        const orderedPool = block.questionIds.map((id) => questions.find((question) => question.id === id)).filter(Boolean);
+        const answeredIds = new Set(latestAttemptsForIds(block.questionIds).map((attempt) => attempt.id));
+        const firstUnanswered = orderedPool.findIndex((question) => !answeredIds.has(question.id));
+        pool = firstUnanswered > 0 ? [...orderedPool.slice(firstUnanswered), ...orderedPool.slice(0, firstUnanswered)] : orderedPool;
+      }
+    } else if (mode === "diagnostic") {
       pool = data.topics
         .map((topic) => shuffle(questions.filter((question) => Number(question.topic) === topic.id))[0])
         .filter(Boolean);
@@ -383,7 +497,10 @@
     } else {
       pool = questions;
     }
-    practiceSet = shuffle(pool).slice(0, mode === "diagnostic" ? 9 : mode === "meeting" ? 5 : mode === "topic" ? 12 : mode === "wrong" ? 20 : 12);
+    practiceSet =
+      mode === "block"
+        ? pool
+        : shuffle(pool).slice(0, mode === "diagnostic" ? 9 : mode === "meeting" ? 5 : mode === "topic" ? 12 : mode === "wrong" ? 20 : 12);
     practiceIndex = 0;
     practiceSelected = null;
     practiceAnswered = false;
@@ -391,6 +508,10 @@
     renderPracticeQuestion();
     renderErrorLedger();
     updatePracticeSummary();
+    if (mode === "block") {
+      renderBlocks();
+      renderBlockDetail();
+    }
   }
 
   function questionTypeLabel(type) {
@@ -413,8 +534,10 @@
     }
     const question = practiceSet[practiceIndex];
     const topic = data.topics.find((item) => item.id === Number(question.topic));
+    const block = data.blocks.find((item) => item.questionIds.includes(question.id));
     panel.innerHTML = `
       <div class="question-meta">
+        ${block ? `<span class="meta-chip block-chip">${escapeHtml(block.id)} · ${escapeHtml(block.title)}</span>` : ""}
         <span class="meta-chip">${topic ? topic.code : `T${question.topic}`}</span>
         <span class="meta-chip">Level ${question.cognitiveLevel || 2}</span>
         <span class="meta-chip red">${questionTypeLabel(question.type)}</span>
@@ -515,6 +638,8 @@
     $("#skipQuestion").textContent = practiceIndex === practiceSet.length - 1 ? "完成本轮" : "下一题";
     updatePracticeSummary();
     renderErrorLedger();
+    renderBlocks();
+    renderBlockDetail();
     renderTopics();
     renderTopicDetail();
   }
@@ -532,7 +657,11 @@
   }
 
   function updatePracticeSummary() {
-    $("#practiceSummary").textContent = `本轮 ${practiceRound.answered} 题 · 正确 ${practiceRound.correct}`;
+    const mode = $("#practiceMode").value;
+    const block = mode === "block" ? data.blocks.find((item) => item.id === activeBlockId) : null;
+    $("#practiceSummary").textContent = block
+      ? `${block.id} · 本轮 ${practiceRound.answered}/${practiceSet.length} · 正确 ${practiceRound.correct}`
+      : `本轮 ${practiceRound.answered} 题 · 正确 ${practiceRound.correct}`;
   }
 
   function renderErrorLedger() {
@@ -761,6 +890,8 @@
 
     mockSession = null;
     $("#closeMock").addEventListener("click", closeMock);
+    renderBlocks();
+    renderBlockDetail();
     renderTopics();
     renderTopicDetail();
   }
@@ -837,6 +968,8 @@
     const weekendMinutes = state.weekendMinutes;
     state = { ...structuredClone(defaultState), examDate, weekdayMinutes, weekendMinutes };
     saveState();
+    renderBlocks();
+    renderBlockDetail();
     renderTopics();
     renderTopicDetail();
     buildPracticeSet();
@@ -849,13 +982,17 @@
       button.addEventListener("click", () => {
         if (button.dataset.practiceMode) {
           $("#practiceMode").value = button.dataset.practiceMode;
+          if (button.dataset.practiceBlock) {
+            activeBlockId = button.dataset.practiceBlock;
+            $("#practiceBlock").value = activeBlockId;
+          }
           buildPracticeSet();
         }
         $(button.dataset.jump)?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
 
-    const sections = ["desk", "syllabus", "practice", "mock", "terms"].map((id) => $(`#${id}`)).filter(Boolean);
+    const sections = ["desk", "blocks", "practice", "mock", "syllabus"].map((id) => $(`#${id}`)).filter(Boolean);
     const navLinks = $$(".nav-link");
     const observer = new IntersectionObserver(
       (entries) => {
@@ -881,7 +1018,18 @@
         renderTopics();
       });
     });
+    $$("[data-block-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        blockFilter = button.dataset.blockFilter;
+        $$("[data-block-filter]").forEach((item) => item.classList.toggle("active", item === button));
+        renderBlocks();
+      });
+    });
     $("#practiceMode").addEventListener("change", buildPracticeSet);
+    $("#practiceBlock").addEventListener("change", () => {
+      activeBlockId = $("#practiceBlock").value;
+      buildPracticeSet();
+    });
     $("#practiceTopic").addEventListener("change", buildPracticeSet);
     $("#newPracticeSet").addEventListener("click", buildPracticeSet);
     $$("[data-confidence]").forEach((button) => {
@@ -907,7 +1055,10 @@
   }
 
   function init() {
+    populatePracticeBlocks();
     populatePracticeTopics();
+    renderBlocks();
+    renderBlockDetail();
     renderTopics();
     renderTopicDetail();
     renderLens();
